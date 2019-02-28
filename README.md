@@ -1,6 +1,6 @@
-g‚¢•û
+*ä½¿ã„æ–¹*
 
-‚PD@ˆÈ‰º‚ÌƒTƒCƒg‚©‚çmodel‚ğƒ_ƒEƒ“ƒ[ƒh‚µAfacialexp_conv/model‚Æ‚µ‚Ä”z’u
-@https://drive.google.com/open?id=1xCQE84BRIWyXZTk-YPVRznMWA1lA3ras
+ï¼‘ï¼ã€€ä»¥ä¸‹ã®ã‚µã‚¤ãƒˆã‹ã‚‰modelã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãƒ»è§£å‡ã—ã€facialexp_convä»¥ä¸‹ã«é…ç½®ï¼ˆfacialexp_conv/model/emo2Imgã‚„txt2emoã«ã™ã‚‹ï¼‰  
+ã€€https://drive.google.com/open?id=1xCQE84BRIWyXZTk-YPVRznMWA1lA3ras
 
-‚QD@main.ipynb‚ğÀs
+ï¼’ï¼ã€€main.ipynbã‚’å®Ÿè¡Œ
