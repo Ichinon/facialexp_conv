@@ -4,6 +4,6 @@
 https://drive.google.com/open?id=1xCQE84BRIWyXZTk-YPVRznMWA1lA3ras
   
   https://drive.google.com/open?id=1BbyqZJtgSLAiPFsSEEPC5SJHr36BMkRB
-  ※テキスト→感情(日本語用モデル追加)
+  ※テキスト→感情の日本語用モデル追加
 
 ２．　main.ipynbを実行
