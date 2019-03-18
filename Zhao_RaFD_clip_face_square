@@ -1,0 +1,175 @@
+#下記のコードを実行するうえで必要な準備二点
+#1. 先日川口さんが用意してくださった、RaFDの感情別フォルダ8個を同じ階層に配置しておく。（切り抜き後のファイルもお渡ししましたが、今回利用するのは、加工前のもので御願いします）
+#2. 切り取った後に保存する感情別に名前を付けた空フォルダを用意しておく。
+
+
+data_root_RaFD = r"RaFDの感情別に分けられたファイルが全ておいてある層のフォルダ名"
+save_root_path = r"感情別のファイルの保存先となる8フォルダがある層のフォルダ名。"
+
+#正方形にする
+#不本意ながら少しデータ数は落とすことになった。
+#きれいにやりたいなら、if文のところの処理を精緻にする必要があるが、そんなに多くなさそうなのでよしとする。
+#端っこに酔ってる場合は8パターン場合分けして、w*(1+scale) が 256, h*(1+scale)=256。として、そのうえで、短い方か長い方に揃える必要がある。
+
+#サイズ問題
+#w * (1 + scale)が255以下のものは、w * (1 + scale)が256になるようにした。
+
+
+import cv2
+import numpy as np
+import os
+import math
+import glob
+import random
+
+#おそらく全員Windowsユーザだと思うので、下記のようなものに近いと思います。
+#うまくいかない場合は、haarcascade_frontalface_default.xmlでPC内検索すればフォルダのPathが分かりますのでそれを下記に代入してください。
+face_cascade_path = r"C:\ProgramData\Anaconda3\Lib\site-packages\cv2\data\haarcascade_frontalface_default.xml"
+eye_cascade_path = r"C:\ProgramData\Anaconda3\Lib\site-packages\cv2\data\haarcascade_eye.xml"
+profile_path = r"C:\ProgramData\Anaconda3\Lib\site-packages\cv2\data\haarcascade_profileface.xml"
+
+
+face_cascade = cv2.CascadeClassifier(face_cascade_path)
+eye_cascade = cv2.CascadeClassifier(eye_cascade_path)
+profile_cascade = cv2.CascadeClassifier(profile_path)
+
+
+
+data_root_RaFD = data_root_RaFD
+
+
+os.chdir(data_root_RaFD)
+emos = glob.glob('*')
+
+# emos
+
+# Out[9]:
+# ['angry',
+#  'contemptuous',
+#  'disgusted',
+#  'fearful',
+#  'happiness',
+#  'neutral',
+#  'sad',
+#  'surprised']
+
+for emo in emos:
+    data_path = data_root_RaFD + emo
+    save_path = save_root_path + emo
+    os.chdir(data_path)
+    pics = glob.glob('*.jpg') 
+    pics = [s for s in pics if not "Rafd000" in s]
+    pics = [s for s in pics if not "Rafd180" in s]
+    
+    profile_list = []
+    
+    #調整変数
+    scale = 0.10
+    ear_cri = 150
+
+    for pic in pics:
+        pic_name = pic[:-4]
+#         print(pic)
+#         print(data_path + "\\" + pic)
+        src = cv2.imread(data_path + "\\" + pic)
+
+        src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+
+        faces = face_cascade.detectMultiScale(src_gray)
+#         print(faces)
+
+        if len(faces) == 0:
+#             print("顔検知できず")
+            profile_list.append(pic)
+
+
+        else:
+    #         print("ここからチェックする",j)
+            k = 0
+            for rect in faces:
+#                 print(rect)
+                x = int(rect[0])
+                y = int(rect[1])
+                w = int(rect[2])
+                h = int(rect[3])
+#                 if w != h:
+#                     print("wとhは違う値でした。")⇒すべて同じだった。
+                if w < ear_cri:
+                    continue
+                if h < ear_cri:
+                    continue
+    #             print("xとは:", x)
+    #             print("yとは:", y)
+    #             print("wとは:", w)
+    #             print("とは:", h)
+                # 顔認識部分を赤線で囲み保存(今はこの部分は必要ない)
+                # cv2.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 0,255), thickness=1)
+                # cv2.imwrite('detected.jpg', img)
+
+#                wh = max(w,h)
+                if w*(1+scale) < 256:
+                    w,h = math.ceil(256 / (1 + scale)) ,math.ceil(256 / (1 + scale))
+                    
+                if (y - math.floor(h*scale/2) < 0) or (y+ math.floor(h*(1+scale)) > 1023) or ( x - math.floor(w*scale/2) < 0) or (x + math.floor(w*(1+scale)) > 680):
+                    continue
+#                     print("not正方形、よって、うまくいかない") 
+                else:
+                    cv2.imwrite(save_path + "\\" + pic_name + "_" + str(int(k)) + ".jpg",src[y - math.floor(h*scale/2) : y+ math.floor(h*(1+scale)),  x - math.floor(w*scale/2) : x + math.floor(w*(1+scale))])
+     #          cv2.imwrite(save_path + j + int(k) + ".jpg",src)
+                k = k + 1
+                #face_detect_count = face_detect_count + 1
+
+
+    #         for x, y, w, h in faces:
+    #             cv2.rectangle(src, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    #             face = src[y: y + h, x: x + w]
+    #             face_gray = src_gray[y: y + h, x: x + w]
+    #             eyes = eye_cascade.detectMultiScale(face_gray)
+    #             for (ex, ey, ew, eh) in eyes:
+    #                 cv2.rectangle(face, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
+
+    #         cv2.imwrite(output_path + j + "_after.jpg", src)
+
+#     print(profile_list)
+
+
+    no_detect = []
+
+    for pic in profile_list:
+        pic_name = pic[:-4]
+        src = cv2.imread(data_path + "\\" + pic)
+
+        src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+
+        faces = profile_cascade.detectMultiScale(src_gray)
+#         print(faces)
+
+        if len(faces) == 0:
+#             print("横顔にしても、顔検知できず")
+            no_detect.append(pic)
+
+        else:
+            k = 0
+            for rect in faces:
+                # 顔認識部分を赤線で囲み保存(今はこの部分は必要ない)
+                # cv2.rectangle(img, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 0,255), thickness=1)
+                # cv2.imwrite('detected.jpg', img)
+                x = int(rect[0])
+                y = int(rect[1])
+                w = int(rect[2])
+                h = int(rect[3])
+                if w < ear_cri:
+                    continue
+                if h < ear_cri:
+                    continue
+#                 wh = max(w,h)
+                if (y - math.floor(h*scale/2) < 0) or (y+ math.floor(h*(1+scale)) > 1023) or ( x - math.floor(w*scale/2) < 0) or (x + math.floor(w*(1+scale)) > 680):
+                    continue
+                elif w <256:
+                    continue
+                else:
+                    cv2.imwrite(save_path + "\\" + pic_name + "_" + str(int(k)) + ".jpg",src[y - math.floor(h*scale/2) : y+ math.floor(h*(1+scale)),  x - math.floor(w*scale/2) : x + math.floor(w*(1+scale))])
+                k = k + 1
+                #face_detect_count = face_detect_count + 1
+    print(emo, "において、", len(pics), "枚の画像を読みこんで、", len(no_detect), "枚は顔をひとつも認識できずでした。", "写真使えた率: \n", 100 * (len(pics) - len(no_detect)) / len(pics), "% でした！")
+#     print(len(pics), "件の画像を読み込んで", len(no_detect), "件は顔を認識できずでした。", "写真使えた率: ", 100 * (len(pics) - len(no_detect)) / len(pics), "% でした！")
