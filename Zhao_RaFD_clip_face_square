@@ -114,7 +114,7 @@ for emo in emos:
                     continue
 #                     print("not正方形、よって、うまくいかない") 
                 else:
-                    cv2.imwrite(save_path + "\\" + pic_name + "_" + str(int(k)) + ".jpg",src[y - math.floor(h*scale/2) : y+ math.floor(h*(1+scale)),  x - math.floor(w*scale/2) : x + math.floor(w*(1+scale))])
+                    cv2.imwrite(save_path + "\\" + pic_name + "_" + str(int(k)) + ".jpg", cv2.resize(src[y - math.floor(h*scale/2) : y+ math.floor(h*(1+scale)),  x - math.floor(w*scale/2) : x + math.floor(w*(1+scale))], size))
      #          cv2.imwrite(save_path + j + int(k) + ".jpg",src)
                 k = k + 1
                 #face_detect_count = face_detect_count + 1
@@ -168,7 +168,7 @@ for emo in emos:
                 elif w <256:
                     continue
                 else:
-                    cv2.imwrite(save_path + "\\" + pic_name + "_" + str(int(k)) + ".jpg",src[y - math.floor(h*scale/2) : y+ math.floor(h*(1+scale)),  x - math.floor(w*scale/2) : x + math.floor(w*(1+scale))])
+                    cv2.imwrite(save_path + "\\" + pic_name + "_" + str(int(k)) + ".jpg", cv2.resize(src[y - math.floor(h*scale/2) : y+ math.floor(h*(1+scale)),  x - math.floor(w*scale/2) : x + math.floor(w*(1+scale))], size))
                 k = k + 1
                 #face_detect_count = face_detect_count + 1
     print(emo, "において、", len(pics), "枚の画像を読みこんで、", len(no_detect), "枚は顔をひとつも認識できずでした。", "写真使えた率: \n", 100 * (len(pics) - len(no_detect)) / len(pics), "% でした！")
