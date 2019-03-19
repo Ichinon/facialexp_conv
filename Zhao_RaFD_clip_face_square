@@ -33,7 +33,7 @@ face_cascade = cv2.CascadeClassifier(face_cascade_path)
 eye_cascade = cv2.CascadeClassifier(eye_cascade_path)
 profile_cascade = cv2.CascadeClassifier(profile_path)
 
-
+size = (256,256)
 
 data_root_RaFD = data_root_RaFD
 
