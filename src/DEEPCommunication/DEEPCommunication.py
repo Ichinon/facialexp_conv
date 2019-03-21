@@ -8,7 +8,26 @@ Created on Sun Mar 17 14:02:43 2019
 # モジュールのインポート
 import os, tkinter, tkinter.filedialog, tkinter.messagebox
 from PIL import Image
+import shutil
+import sys
+import torch
 
+## StarGAN用のパラメータ
+# stargan.pyのインポート
+sys.path.append(os.path.join(os.path.dirname(__file__), '../stg'))
+import stargan
+
+# 学習済みモデルディレクトリ
+ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/emo2img256')
+# 推論用入力画像配置ディレクトリ
+inpImageDir = os.path.join(os.path.dirname(__file__), '../../inp/production')
+# 出力ファイルパス
+resImagePath = os.path.join(os.path.dirname(__file__), '../../res/result.gif')
+# 感情クラス数
+c_dim = 7
+# ジェネレータのインスタンス
+G = stargan.Generator(conv_dim=64, c_dim=7, repeat_num=6)
+G.to(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 
 """
 岩間さん修正して下さい
@@ -20,6 +39,9 @@ def initializeEmotionDetect():
 Ichinonさん修正して下さい。
 """
 def initializeStarGAN():
+    resume_iters = 200000
+    G_path = os.path.join(ganModelDir, '{}-G.ckpt'.format(resume_iters))
+    G.load_state_dict(torch.load(G_path, map_location=lambda storage, loc: storage))
     return
 
 """
@@ -32,7 +54,15 @@ def detectEmotion(text):
 Ichinonさん修正して下さい。
 """ 
 def transformImage(baseImage, emotionclass):
-    return "./OutputImage/Test.jpg"
+    # baseImageを所定のフォルダにコピー
+    basename = os.path.basename(baseImage)
+    inpImage = os.path.join(inpImageDir, 'neu', basename)
+    shutil.copyfile(baseImage, inpImage)
+
+    # 画像生成
+    stargan.test_mv(G, inpImageDir, resImagePath, torch.Tensor([2]), c_dim)
+
+    return resImagePath
 
 def initialize():
     print("===[Start Initilization]====================")
@@ -102,9 +132,12 @@ def selectEmotion(emotionlist):
 def presentTransformedImage(transformedImagePath):
     print("===[Start Presentation of Transformed Image]====================")
     #感情変換後の画像表示
-    im = Image.open(transformedImagePath)    
-    im.show()
-    print("===[End Presentation of Transformed Image]====================")
+    import subprocess
+    cmd = 'start' +  ' ' + transformedImagePath
+    subprocess.call(cmd, shell=True)
+    # im = Image.open(transformedImagePath)    
+    # im.show()
+
     return
 
 def getNextAction():
