@@ -3,9 +3,9 @@
 # Directories.
 celeba_image_dir='data/celeba/images'   # 'data/celeba/images'
 attr_path = 'data/celeba/list_attr_celeba.txt'  # 'data/celeba/list_attr_celeba.txt'
-rafd_image_dir='inp/test'   # 'data/RaFD/train'
+rafd_image_dir='inp/test256'   # 'data/RaFD/train'
 log_dir='stargan/logs'  # 'stargan/logs'
-model_save_dir='models/emo2Img'     # 'stargan/models'
+model_save_dir='models/emo2Img256'     # 'stargan/models'
 sample_dir='stargan/samples'        # 'stargan/samples'
 result_dir='res'    # 'stargan/results'
 #----------------------------------------------------------------------------
@@ -28,11 +28,11 @@ beta2=0.999    # 'beta2 for Adam optimizer')
 resume_iters=None    # 'resume training from this step')
 #----------------------------------------------------------------------------
 # Model configuration.
-c_dim=3     # 5 'dimension of domain labels (1st dataset)')
+c_dim=7     # 5 'dimension of domain labels (1st dataset)')
 c2_dim=8    # 8 'dimension of domain labels (2nd dataset)')
 celeba_crop_size=178    # 'crop size for the CelebA dataset')
 rafd_crop_size=256    # 'crop size for the RaFD dataset')
-image_size=64   # 128 'image resolution'
+image_size=256   # 128 'image resolution'
 g_conv_dim=64    # 'number of conv filters in the first layer of G')
 d_conv_dim=64    # 'number of conv filters in the first layer of D')
 g_repeat_num=6    # 'number of residual blocks in G')
@@ -42,7 +42,7 @@ lambda_rec=10    # 'weight for reconstruction loss')
 lambda_gp=10    # 'weight for gradient penalty')
 #----------------------------------------------------------------------------
 # Test configuration.
-test_iters=200000    # 'test model from this step')
+test_iters=110000    # 'test model from this step')
 #----------------------------------------------------------------------------
 # Step size.
 log_step=10
