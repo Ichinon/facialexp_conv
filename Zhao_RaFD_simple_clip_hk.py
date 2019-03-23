@@ -26,5 +26,4 @@ for emo in emos:
 #         print(data_path + "\\" + pic)
         src = cv2.imread(data_path + "\\" + pic)
 
-        src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         cv2.imwrite(save_path + "\\" + pic_name + ".png", cv2.resize(src[130 : 130 + 600,  20 : 20 + 600], size))
