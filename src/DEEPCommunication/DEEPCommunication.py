@@ -12,6 +12,8 @@ from PIL import Image
 import shutil
 import sys
 import torch
+import numpy as np
+import cv2
 
 ## StarGAN用のパラメータ
 # stargan.pyのインポート
@@ -29,6 +31,8 @@ c_dim = 7
 # ジェネレータのインスタンス
 G = stargan.Generator(conv_dim=64, c_dim=7, repeat_num=6)
 G.to(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+# CV2 顔検出用モデルファイル Hironobu-Kawaguchi
+face_cascade_path = '../../models/cv2/haarcascade_frontalface_default.xml'
 
 """
 Ichinonさん修正して下さい。
@@ -39,15 +43,57 @@ def initializeStarGAN():
     G.load_state_dict(torch.load(G_path, map_location=lambda storage, loc: storage))
     return
 
+### OpenCVで顔検出し、inputフォルダに格納   Hironobu-Kawaguchi 2019.3.24
+def imread(filename, flags=cv2.IMREAD_COLOR, dtype=np.uint8):   ### 日本語のパスに対応用
+    try:
+        n = np.fromfile(filename, dtype)
+        img = cv2.imdecode(n, flags)
+        return img
+    except Exception as e:
+        print(e)
+        return None
+def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
+    size = (crop_size, crop_size)
+    print(baseImage)
+    #src = cv2.imread(baseImage)
+    src = imread(baseImage)     ### 日本語のパスに対応用
+    print(type(src))
+    basename = os.path.basename(baseImage)
+    pic_name = basename[:-4]
+    face_cascade = cv2.CascadeClassifier(face_cascade_path)
+    src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(src_gray)
+    print("detect", faces.shape[0], "faces", basename)
+
+    for i, face_detect in enumerate(faces):
+        leftmargin = face_detect[0] / face_detect[2]
+        rightmargin = (src.shape[1] - face_detect[0] - face_detect[2]) / face_detect[2]
+        upmargin = face_detect[1] / face_detect[3]
+        downmargin  = (src.shape[0] - face_detect[1] - face_detect[3]) / face_detect[3]
+        margin = min(margin_c, leftmargin, rightmargin, upmargin, downmargin)
+        #print(src.shape, margin)
+        x = int(face_detect[0] - face_detect[2] * margin)
+        y = int(face_detect[1] - face_detect[3] * margin)
+        w = int(face_detect[2] * (1 + margin*2))
+        h = int(face_detect[3] * (1 + margin*2))
+        face = src[y: y+h, x: x+w]
+
+        outfile_name = pic_name + str(i) + ".png"
+        inpImage = os.path.join(inpImageDir, 'neu', outfile_name)
+        print("face [x, y, w, h] =", face_detect, basename, "->" , outfile_name)
+        cv2.imwrite(inpImage, cv2.resize(face, size))
 
 """
 Ichinonさん修正して下さい。
 """
 def transformImage(baseImage, emotionclass):
+    """ save_faceImage に処理を置き換え Hironobu-Kawaguchi 2019.3.24
     # baseImageを所定のフォルダにコピー
     basename = os.path.basename(baseImage)
     inpImage = os.path.join(inpImageDir, 'neu', basename)
     shutil.copyfile(baseImage, inpImage)
+    """
+    save_faceImage(baseImage, crop_size=256, margin_c=0.5)
 
     # 画像生成
     stargan.test_mv(G, inpImageDir, resImagePath, torch.Tensor([2]), c_dim)
@@ -58,7 +104,6 @@ def initialize():
     print("===[Start Initilization]====================")
     #StarGAN初期化呼び出し
     initializeStarGAN()
-
     print("===[End Initilization]======================")
     return
 
