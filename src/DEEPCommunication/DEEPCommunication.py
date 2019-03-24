@@ -32,7 +32,7 @@ c_dim = 7
 G = stargan.Generator(conv_dim=64, c_dim=7, repeat_num=6)
 G.to(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 # CV2 顔検出用モデルファイル Hironobu-Kawaguchi
-face_cascade_path = '../../models/cv2/haarcascade_frontalface_default.xml'
+face_cascade_path = os.path.join(os.path.dirname(__file__),'../../models/cv2/haarcascade_frontalface_default.xml')
 
 """
 Ichinonさん修正して下さい。
