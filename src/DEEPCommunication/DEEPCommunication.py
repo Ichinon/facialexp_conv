@@ -82,6 +82,7 @@ def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
         inpImage = os.path.join(inpImageDir, 'neu', outfile_name)
         #print("face [x, y, w, h] =", face_detect, basename, "->" , outfile_name)
         cv2.imwrite(inpImage, cv2.resize(face, size))
+    return
 
 """
 Ichinonさん修正して下さい。
