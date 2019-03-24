@@ -54,10 +54,10 @@ def imread(filename, flags=cv2.IMREAD_COLOR, dtype=np.uint8):   ### 日本語の
         return None
 def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
     size = (crop_size, crop_size)
-    print(baseImage)
+    #print(baseImage)
     #src = cv2.imread(baseImage)
     src = imread(baseImage)     ### 日本語のパスに対応用
-    print(type(src))
+    #print(type(src))
     basename = os.path.basename(baseImage)
     pic_name = basename[:-4]
     face_cascade = cv2.CascadeClassifier(face_cascade_path)
@@ -80,7 +80,7 @@ def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
 
         outfile_name = pic_name + str(i) + ".png"
         inpImage = os.path.join(inpImageDir, 'neu', outfile_name)
-        print("face [x, y, w, h] =", face_detect, basename, "->" , outfile_name)
+        #print("face [x, y, w, h] =", face_detect, basename, "->" , outfile_name)
         cv2.imwrite(inpImage, cv2.resize(face, size))
 
 """
