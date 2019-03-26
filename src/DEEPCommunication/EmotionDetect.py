@@ -4,29 +4,27 @@ Created on Thu Mar 21 13:47:00 2019
 
 @author: iwama
 """
-import pickle,numpy as np
-from keras.models import load_model
-from keras.preprocessing.sequence import pad_sequences
+import fasttext as ft
+from janome.tokenizer import Tokenizer
 
 class Text2Emo:
     def __init__(self):
-        self.MAX_SEQUENCE_LENGTH = 280
-        with open('../../models/txt2emo/tokenizer_cnn_ja.pkl', 'rb') as handle:
-            self.tokenizer = pickle.load(handle)
-        self.emoClasses  =  ["happy", "sad", "disgust", "angry", "fear", "surprise"]
-        self.text2emoModel = load_model('../../models/txt2emo/model_2018-08-28-15_00.h5')
+        self.tokenizer = Tokenizer()
+        self.emoClasses  =  {"__label__0":"happy","__label__1":"sad","__label__2":"disgust","__label__3":"angry","__label__4":"fear","__label__5":"surprised"}
+        self.text2emoModel = ft.load_model("fasttext_model_100_epo1000.bin")
 
     def detectEmotion(self,text):
-        targets = pad_sequences(self.tokenizer.texts_to_sequences(text), maxlen=self.MAX_SEQUENCE_LENGTH)
-        emoProb = self.text2emoModel.predict(targets)
-        emoProbSoftmax = self.softmax2(emoProb[0])
-        emotionList = dict(zip(self.emoClasses, emoProbSoftmax))
-        return emotionList
+        tokens = self.tokenizer.tokenize(text)
+        wakatis = []
+        wakati_list=[]
+        for token in tokens:
+            wakati_list.append(token.surface)
+            wakati=" ".join(wakati_list)
+        wakatis.append(wakati)
 
-    #ソフトマックス関数を使用すると確率差が小さいため、こちらの関数を使用して確率算出
-    def softmax2(self,a):
-        c = np.max(a)
-        sum_a = np.sum(a)
-        y = a / sum_a
-        print(y)
-        return y
+        estimate = self.text2emoModel.predict_proba(wakatis,k=6)
+        emoProbList = dict(estimate[0])
+        emotionList={}
+        for key in emoProbList:
+          emotionList[self.emoClasses[key]] = emoProbList[key]
+        return emotionList
