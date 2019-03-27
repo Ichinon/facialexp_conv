@@ -52,6 +52,22 @@ def imread(filename, flags=cv2.IMREAD_COLOR, dtype=np.uint8):   ### 日本語の
     except Exception as e:
         print(e)
         return None
+    
+def imwrite(filename, img, params=None):
+    try:
+        ext = os.path.splitext(filename)[1]
+        result, n = cv2.imencode(ext, img, params)
+
+        if result:
+            with open(filename, mode='w+b') as f:
+                n.tofile(f)
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        return False    
+
 def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
     size = (crop_size, crop_size)
     #print(baseImage)
@@ -81,7 +97,7 @@ def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
         outfile_name = pic_name + str(i) + ".png"
         inpImage = os.path.join(inpImageDir, 'neu', outfile_name)
         #print("face [x, y, w, h] =", face_detect, basename, "->" , outfile_name)
-        cv2.imwrite(inpImage, cv2.resize(face, size))
+        imwrite(inpImage, cv2.resize(face, size))
     return
 
 """
