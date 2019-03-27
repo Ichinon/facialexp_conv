@@ -8,6 +8,7 @@ Created on Sun Mar 17 14:02:43 2019
 # モジュールのインポート
 import os, tkinter, tkinter.filedialog, tkinter.messagebox,time,itertools
 from EmotionDetect import Text2Emo
+from pixyz.distributions import Deterministic, DataDistribution
 from PIL import Image
 import shutil
 import sys
@@ -18,7 +19,7 @@ import cv2
 ## StarGAN用のパラメータ
 # stargan.pyのインポート
 sys.path.append(os.path.join(os.path.dirname(__file__), '../stg'))
-import stargan
+from stargan_pixyz import StarGAN, Generator
 
 # 学習済みモデルディレクトリ
 ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/emo2img256')
@@ -28,20 +29,23 @@ inpImageDir = os.path.join(os.path.dirname(__file__), '../../inp/production')
 resImagePath = os.path.join(os.path.dirname(__file__), '../../res/result.gif')
 # 感情クラス数
 c_dim = 7
-# ジェネレータのインスタンス
-G = stargan.Generator(conv_dim=64, c_dim=7, repeat_num=6)
-G.to(torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+# 生成画像サイズ
+image_size = 256
+# gif出力モード
+mode = 'test_mv'
+# modelのiteration番号
+resume_iters = 200000
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# Emotional class dist.
+c = DataDistribution(["c"]).to(device)
+# Data dist.
+p_data = DataDistribution(["x"]).to(device)
+# generator
+G = Generator(conv_dim=64, c_dim=c_dim, repeat_num=6).to(device)
+
 # CV2 顔検出用モデルファイル Hironobu-Kawaguchi
 face_cascade_path = os.path.join(os.path.dirname(__file__),'../../models/cv2/haarcascade_frontalface_default.xml')
-
-"""
-Ichinonさん修正して下さい。
-"""
-def initializeStarGAN():
-    resume_iters = 200000
-    G_path = os.path.join(ganModelDir, '{}-G.ckpt'.format(resume_iters))
-    G.load_state_dict(torch.load(G_path, map_location=lambda storage, loc: storage))
-    return
 
 ### OpenCVで顔検出し、inputフォルダに格納   Hironobu-Kawaguchi 2019.3.24
 def imread(filename, flags=cv2.IMREAD_COLOR, dtype=np.uint8):   ### 日本語のパスに対応用
@@ -100,29 +104,34 @@ def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
         imwrite(inpImage, cv2.resize(face, size))
     return
 
-"""
-Ichinonさん修正して下さい。
-"""
+
 def transformImage(baseImage, emotionclass):
-    """ save_faceImage に処理を置き換え Hironobu-Kawaguchi 2019.3.24
-    # baseImageを所定のフォルダにコピー
-    basename = os.path.basename(baseImage)
-    inpImage = os.path.join(inpImageDir, 'neu', basename)
-    shutil.copyfile(baseImage, inpImage)
-    """
+
+    # 入力画像を所定のサイズで切り出しし所定の場所に保存
     save_faceImage(baseImage, crop_size=256, margin_c=0.5)
 
+    # label生成
+    # 0:angry 1:disgusted 2:fearful 3:happy 4:neutral 5:sad 6:surprised
+    if emotionclass == "happy":
+        c_trg = torch.Tensor([3])
+    elif emotionclass == "sad":
+        c_trg = torch.Tensor([5])
+    elif emotionclass == "disgust":
+        c_trg = torch.Tensor([1])
+    elif emotionclass == "angry":
+        c_trg = torch.Tensor([0])
+    elif emotionclass == "fear":
+        c_trg = torch.Tensor([2])
+    elif emotionclass == "surprised":
+        c_trg = torch.Tensor([6])
+    else:
+        print('不適切な感情クラスが入力されため、画像生成しません.')
+        return None
+
     # 画像生成
-    stargan.test_mv(G, inpImageDir, resImagePath, torch.Tensor([2]), c_dim)
+    emo2Img.test(resImagePath, c_trg, torch.Tensor([4]), c_dim)
 
     return resImagePath
-
-def initialize():
-    print("===[Start Initilization]====================")
-    #StarGAN初期化呼び出し
-    initializeStarGAN()
-    print("===[End Initilization]======================")
-    return
 
 
 def setBaseImage():
@@ -176,15 +185,12 @@ def selectEmotion(emotionlist):
     return selectedEmotion
 
 
-
 def presentTransformedImage(transformedImagePath):
     print("===[Start Presentation of Transformed Image]====================")
     #感情変換後の画像表示
     import subprocess
     cmd = 'start' +  ' ' + transformedImagePath
     subprocess.call(cmd, shell=True)
-    # im = Image.open(transformedImagePath)    
-    # im.show()
     print("===[End Presentation of Transformed Image]====================")
 
     return
@@ -206,8 +212,10 @@ DEEP Communicationのメイン処理
 """
 if __name__ == '__main__':
     #Initialization
-    initialize()
+    print("===[Start Initilization]====================")
+    emo2Img = StarGAN(p_data, G, c, inpImageDir, mode, c_dim=c_dim, image_size=image_size, resume_iters=resume_iters, model_save_dir=ganModelDir)
     text2Emo = Text2Emo()
+    print("===[End Initilization]======================")
     userChange = False
     exitProcess = False
 
