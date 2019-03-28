@@ -1,12 +1,16 @@
 ## 使い方
 
 1. モデルファイルダウンロード・解凍
-facialexp_conv以下に配置（facialexp_conv/model/emo2Imgやtxt2emoにする）  
-- 
-　https://drive.google.com/open?id=1xCQE84BRIWyXZTk-YPVRznMWA1lA3ras
-  
+- fasttext用モデル (DEEPCommunicationフォルダ用)
+  https://drive.google.com/file/d/1_AUDhS2XWLI89KSumsBm0J32VPg-K3XS/view
+- StarGAN 256x256 (emo2Img256フォルダ用)
+　https://1drv.ms/u/s!AvHteFLdGh-D5bpOWp-P5wNRVYxp4Q
+
+以下は最終版では使用しない（はず）
+- テキスト→感情モデル (txt2emoフォルダ用)
   https://drive.google.com/open?id=1BbyqZJtgSLAiPFsSEEPC5SJHr36BMkRB
-  ※テキスト→感情の日本語用モデル追加
+- StarGAN 64x64 (emo2Imgフォルダ用)
+　https://drive.google.com/open?id=1xCQE84BRIWyXZTk-YPVRznMWA1lA3ras
 
 2. 下記フォルダ構成に格納する。
 ```
@@ -34,9 +38,21 @@ facialexp_conv
     └── tec
 ```
 
-3. 必要なモジュールインストール
+3. 必要なモジュールインストール (windows10を想定)
+```
+pip install fasttext_win
+pip install janome
+git clone https://github.com/masa-su/pixyz.git
+pip install -e pixyz
+```
 
-4. main.ipynbを実行
+4. 実行
+```
+cd src/DEEPCommunication
+python DEEPCommunication.py
+```
+メッセージに従い、画像ファイル、メッセージ、感情を選択してください。
+
 
 ## FAQ
 - `warning: CRLF will be replaced by LF in src/DEEPCommunication/DEEPCommunication.py.
