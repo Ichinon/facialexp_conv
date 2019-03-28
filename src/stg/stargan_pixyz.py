@@ -541,7 +541,7 @@ class StarGAN(Model):
                     images.insert(0,im)
 
                 images[0].save(oupImage, save_all=True, append_images=images[1:], optimize=False, duration=200, loop=0)
-                print('Saved real and fake images into {}...'.format(oupImage))           
+                # print('Saved real and fake images into {}...'.format(oupImage))           
 
 
 if __name__ == '__main__':

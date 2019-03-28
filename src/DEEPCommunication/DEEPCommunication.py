@@ -98,9 +98,11 @@ def save_faceImage(baseImage, crop_size=256, margin_c=0.5):
         h = int(face_detect[3] * (1 + margin*2))
         face = src[y: y+h, x: x+w]
 
-        outfile_name = pic_name + str(i) + ".png"
-        inpImage = os.path.join(inpImageDir, 'neu', outfile_name)
+        # outfile_name = pic_name + str(i) + ".png"
+        # inpImage = os.path.join(inpImageDir, 'neu', outfile_name)
         #print("face [x, y, w, h] =", face_detect, basename, "->" , outfile_name)
+
+        inpImage = os.path.join(inpImageDir, 'neu', 'inp.png')
         imwrite(inpImage, cv2.resize(face, size))
     return
 

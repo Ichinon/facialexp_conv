@@ -1,0 +1,13 @@
+.vscode/launch.json
+*.png
+*.json
+*.jpg
+models/emo2img256/200000-D.ckpt
+models/emo2img256/200000-G.ckpt
+models/txt2emo/model_2018-08-28-15_00.h5
+models/txt2emo/tokenizer_cnn_ja.pkl
+res/result.gif
+src/DEEPCommunication/__pycache__/EmotionDetect.cpython-36.pyc
+src/stg/__pycache__/stargan.cpython-36.pyc
+*.ckpt
+*.DESKTOP-C7JNVDF

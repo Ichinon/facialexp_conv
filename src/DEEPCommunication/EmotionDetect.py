@@ -6,12 +6,13 @@ Created on Thu Mar 21 13:47:00 2019
 """
 import fasttext as ft
 from janome.tokenizer import Tokenizer
+import os
 
 class Text2Emo:
     def __init__(self):
         self.tokenizer = Tokenizer()
         self.emoClasses  =  {"__label__0":"happy","__label__1":"sad","__label__2":"disgust","__label__3":"angry","__label__4":"fear","__label__5":"surprised"}
-        self.text2emoModel = ft.load_model("fasttext_model_30.bin")
+        self.text2emoModel = ft.load_model(os.path.join(os.path.dirname(__file__), "fasttext_model_30.bin"))
 
     def detectEmotion(self,text):
         tokens = self.tokenizer.tokenize(text)
