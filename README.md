@@ -20,13 +20,13 @@ facialexp_conv
 ├── models
 │   ├── cv2
 │   │   └── haarcascade_frontalface_default.xml ※OpenCV用モデルファイル
-│   ├── emo2Img ※フォルダを作成してください
+│   ├── emo2Img
 │   │   ├── 200000-D.ckpt ※StarGAN 64x64用モデルファイル
 │   │   └── 200000-G.ckpt ※StarGAN 64x64用モデルファイル
 │   ├── emo2Img256 ※フォルダを作成してください
 │   │   ├── 200000-D.ckpt ※StarGAN 256x256用モデルファイル
 │   │   └── 200000-G.ckpt ※StarGAN 256x256用モデルファイル
-│   └── txt2emo ※フォルダを作成してください
+│   └── txt2emo
 │       ├── checkpoint-0.923.h5       ※テキスト→感情モデルファイル
 │       ├── model_2018-08-28-15_00.h5 ※テキスト→感情モデルファイル
 │       └── tokenizer_cnn_ja.pkl      ※テキスト→感情モデルファイル
