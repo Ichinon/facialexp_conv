@@ -44,6 +44,7 @@ pip install fasttext_win
 pip install janome
 git clone https://github.com/masa-su/pixyz.git
 pip install -e pixyz
+apt-get install python3-tk
 ```
 
 4. 実行
