@@ -22,7 +22,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../stg'))
 from stargan_pixyz import StarGAN, Generator
 
 # 学習済みモデルディレクトリ
-ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/emo2img256')
+# ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/emo2img256')
+ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/RaFD+ffhq_256_batch16')
+# ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/RaFD+ffhq+ck_128_batch16')
+# ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/RaFD_128_batch16')
 # 推論用入力画像配置ディレクトリ
 inpImageDir = os.path.join(os.path.dirname(__file__), '../../inp/production')
 # 出力ファイルパス
@@ -143,7 +146,8 @@ def setBaseImage():
     root = tkinter.Tk()
     root.withdraw()
     fTyp = [("","*")]
-    iDir = os.path.abspath(os.path.dirname(__file__))
+    # iDir = os.path.abspath(os.path.dirname(__file__))
+    iDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../inp'))
     file = None
     while file is None:
         tkinter.messagebox.showinfo('Deep Communication','ベースとする顔写真を選んで下さい！')

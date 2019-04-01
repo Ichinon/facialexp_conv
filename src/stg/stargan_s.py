@@ -9,7 +9,6 @@ import torch.nn.functional as F
 from torchvision.datasets import ImageFolder
 from torchvision.utils import save_image
 from torch.utils import data
-import numpy as np
 import os
 import time
 import datetime
@@ -302,7 +301,7 @@ class StarGAN(Model):
         # 感情クラス数
         self.c_dim = c_dim
         # 学習回数
-        self.num_iters = 500000
+        self.num_iters = 200000
         # 学習開始iteration回数
         self.resume_iters = resume_iters
         # loss表示頻度：↓回に1回表示
@@ -314,7 +313,7 @@ class StarGAN(Model):
         # 学習データセットパス
         self.image_dir = image_dir
         # 出力先親フォルダパス：この下にモデル・ログ・サンプルをフォルダを作成し出力
-        self.out_parent_dir = "C:/Users/Ichiyama/Documents/GitHub/facialexp_conv/test/test_hn_64_16"
+        self.out_parent_dir = os.path.join(os.path.dirname(__file__), "../../")
         # 学習時かどうかのフラグ：データ拡張実施有無に利用
         self.mode = mode
         # 実行環境指示
@@ -600,118 +599,31 @@ if __name__ == '__main__':
 ##### Training #####
 ###############################
     
-    # image_dir = "C:/Users/Ichiyama/Documents/GitHub/facialexp_conv/data/RaFD_8/train"
-    # c_dim = 8
-    
-    # image_dir = "C:/Users/Ichiyama/Documents/GitHub/facialexp_conv/data/RaFD+ffhq_7class"
-    # c_dim = 7
-
-    # 
-    image_dir = "C:/Users/Ichiyama/Documents/GitHub/facialexp_conv/data/RaFD+ffhq_hn"
-    c_dim = 2
-    
+### parameter
+    # 学習用データパス
+    image_dir = os.path.join(os.path.dirname(__file__), "../../data/team1_dataset_500")
+    # 感情クラス数
+    c_dim = 7
+    # 学習画像サイズ
     image_size = 64
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     mode = 'train'
 
-    # emotional class dist.
-    c = DataDistribution(["c"]).to(device)
+### distribution
 
     # generator
     G = Generator(conv_dim=64, c_dim=c_dim, repeat_num=6).to(device)
-
     # discriminator
     D = Discriminator(image_size=image_size, conv_dim=64, c_dim=c_dim, repeat_num=6).to(device)
-
-    # Data dist.
+    # real data
     p_data = DataDistribution(["x"]).to(device)
+    # target emotion class
+    c = DataDistribution(["c"]).to(device)
 
-    # set model
-    resume_iters = 85000
-    model = StarGAN(p_data, G, c, image_dir, mode, discriminator=D, c_dim=c_dim, image_size=image_size, resume_iters=resume_iters)
+### model
+    model = StarGAN(p_data, G, c, image_dir, mode, discriminator=D, c_dim=c_dim, image_size=image_size)
     
-    # training
+### training
     model.train()
 
-    # TODO:StarGANの入力をG,cでなくpにするように変更
-    # Gのモデルをロードするために別々に入力している
-    # 以下に直す
-    # p = (G*c).to(device)
-    # model = StarGAN(p_data, ｐ, D, c_dim=c_dim, image_size=image_size, resume_iters=10000)
-    # 
-    # その他の修正
-    # ・pのモデルを保存して読み込みに変更
-
-    # image_size = 256
-    # # 学習済みモデルディレクトリ
-    # ganModelDir = os.path.join(src_dir, '../../models/emo2img256')
-    # # 推論用入力画像配置ディレクトリ
-    # inpImageDir = os.path.join(src_dir, '../../inp/production')
-    # # 出力ファイルパス
-    # resImagePath = os.path.join(src_dir, '../../res/result.gif')
-    # # 感情クラス数
-    # c_dim = 7
-    # # 元々の画像のクラス：neutralで固定
-    # c_org = torch.Tensor([4])
-    # # モデルのiteration番号
-    # resume_iters = 200000
-    # # mode
-    # mode = 'test_mv'
-
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    # # emotional class dist.
-    # c = DataDistribution(["c"]).to(device)
-
-    # # generator
-    # G = Generator(conv_dim=64, c_dim=c_dim, repeat_num=6).to(device)
-
-    # # Data dist.
-    # p_data = DataDistribution(["x"]).to(device)
-
-    # # set model
-    # model = StarGAN(p_data, G, c, inpImageDir, mode, c_dim=c_dim, image_size=image_size, resume_iters=resume_iters, model_save_dir=ganModelDir)
-    
-    # # training
-    # model.test(resImagePath, torch.Tensor([3]), c_org, c_dim)
-
-###############################
-##### test_images example #####
-###############################
-
-    # image_size = 256
-    # # 学習済みモデルディレクトリ
-    # # ganModelDir = os.path.join(src_dir, '../../models/emo2img256')
-    # # ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/RaFD+ffhq_256_batch16')
-    # # ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/RaFD+ffhq+ck_128_batch16')
-    # # ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/RaFD_128_batch16')
-    # ganModelDir = os.path.join(os.path.dirname(__file__), '../../models/CelebA+RaFD_128_batch32')
-    # # モデルのiteration番号
-    # resume_iters = 94000
-    # # 推論用入力画像配置ディレクトリ
-    # inpImageDir = os.path.join(src_dir, '../../inp/matsuo_test')
-    # # 出力ファイルパス
-    # resImagePath = os.path.join(src_dir, '../../res')
-    # # 感情クラス数
-    # # c_dim = 7
-    # c_dim = 20 # both
-    # # mode
-    # mode = 'test_mv'
-    # batch_size = 16
-
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    # # emotional class dist.
-    # c = DataDistribution(["c"]).to(device)
-
-    # # generator
-    # G = Generator(conv_dim=64, c_dim=c_dim, repeat_num=6).to(device)
-
-    # # Data dist.
-    # p_data = DataDistribution(["x"]).to(device)
-
-    # # set model
-    # model = StarGAN(p_data, G, c, inpImageDir, mode, c_dim=c_dim, image_size=image_size, resume_iters=resume_iters, model_save_dir=ganModelDir)
-    
-    # # training
-    # model.test_images(resImagePath, c_dim, batch_size)
